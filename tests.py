@@ -1,24 +1,64 @@
 from main import BooksCollector
+import pytest
 
-# класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
-# обязательно указывать префикс Test
 class TestBooksCollector:
 
-    # пример теста:
-    # обязательно указывать префикс test_
-    # дальше идет название метода, который тестируем add_new_book_
-    # затем, что тестируем add_two_books - добавление двух книг
-    def test_add_new_book_add_two_books(self):
-        # создаем экземпляр (объект) класса BooksCollector
+    @pytest.mark.parametrize("book, rating", [
+        ("Гарри Поттер", 5),
+        ("Властелин Колец", 4),
+    ])
+    def test_set_book_rating(self, book, rating):
+        collector = BooksCollector()  # Создаем новый экземпляр BooksCollector для каждого теста
+        collector.add_new_book(book)
+        collector.set_book_rating(book, rating)
+        assert collector.get_book_rating(book) == rating
+
+    @pytest.mark.parametrize("book, expected_rating", [
+        ("Гарри Поттер", 5),
+        ("Властелин Колец", 4),
+    ])
+    def test_get_books_rating(self, book, expected_rating):
         collector = BooksCollector()
+        collector.add_new_book(book)
+        collector.set_book_rating(book, expected_rating)
+        books_rating = collector.get_books_rating()
+        assert books_rating == {book: expected_rating}
 
-        # добавляем две книги
-        collector.add_new_book('Гордость и предубеждение и зомби')
-        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
+    @pytest.mark.parametrize("book", [
+        "Гарри Поттер",
+        "Властелин Колец",
+    ])
+    def test_add_book_in_favorites(self, book):
+        collector = BooksCollector()
+        collector.add_new_book(book)
+        collector.add_book_in_favorites(book)
+        assert collector.get_list_of_favorites_books() == [book]
 
-        # проверяем, что добавилось именно две
-        # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
-        assert len(collector.get_books_rating()) == 2
+    @pytest.mark.parametrize("book", [
+        "Гарри Поттер",
+        "Властелин Колец",
+    ])
+    def test_delete_book_from_favorites(self, book):
+        collector = BooksCollector()
+        collector.add_new_book(book)
+        collector.add_book_in_favorites(book)
+        collector.delete_book_from_favorites(book)
+        assert collector.get_list_of_favorites_books() == []
 
-    # напиши свои тесты ниже
-    # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
+    @pytest.mark.parametrize("invalid_rating", [
+        15,
+        20,
+    ])
+    def test_set_invalid_book_rating(self, invalid_rating):
+        collector = BooksCollector()
+        book = "Гарри Поттер"
+        collector.add_new_book(book)
+        collector.set_book_rating(book, invalid_rating)
+        assert collector.get_book_rating(book) <= 10
+
+    def test_add_existing_book(self):
+        collector = BooksCollector()
+        book = "Гарри Поттер"
+        collector.add_new_book(book)
+        collector.add_new_book(book)
+        assert collector.get_books_rating() == {book: 1}
