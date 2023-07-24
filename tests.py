@@ -71,7 +71,7 @@ class TestBooksCollector:
         collector.add_new_book("Властелин колец")
         collector.set_book_rating("Евгений Онегин", 10)
         collector.set_book_rating("Гарри Поттер", 7)
-        collector.set_book_rating("Властелин колец", 7)
+        collector.set_book_rating("Властелин колец", 5)
         assert collector.get_books_with_specific_rating(3) == [], "Выведен список с некорректными данными"
 
     def test_add_book_in_favorites(self):
